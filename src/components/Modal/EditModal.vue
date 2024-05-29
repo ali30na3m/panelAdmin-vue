@@ -86,7 +86,5 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
 })
 </script>
-    
-  <style scoped>
+<style scoped>
 </style>
-  
