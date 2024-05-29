@@ -26,21 +26,19 @@ import { defineProps, defineEmits, onMounted, onUnmounted } from 'vue'
 
 interface ProductInfo {
   id?: number | null
-  title: string
-  price: number | null
-  count: number | null
-  img: string
-  popularity: number | null
-  sale: number | null
-  colors: number | null
+  title?: string
+  price?: number | null
+  count?: number | null
+  img?: string
+  popularity?: number | null
+  sale?: number | null
+  colors?: number | null
 }
 
 const props = defineProps<{ isOpen: boolean; editsValue: ProductInfo }>()
 const emit = defineEmits(['close'])
 
 const editModal = () => {
-  console.log(props.editsValue)
-
   try {
     fetch(`http://localhost:8000/api/products/${props.editsValue.id}`, {
       method: 'PUT',

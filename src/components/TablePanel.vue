@@ -3,7 +3,7 @@
     <thead>
       <tr>
         <TableHeader
-          class="px-16"
+          class="px-14"
           v-for="(header, index) in headers"
           :key="index"
           :label="header"
