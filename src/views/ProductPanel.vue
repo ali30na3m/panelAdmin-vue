@@ -28,7 +28,7 @@
         ثبت محصول
       </button>
     </div>
-    <div class="bg-white mt-9 py-4 px-5">
+    <div class="bg-white mt-9 py-4 px-5 mb-4">
       <TablePanel v-if="products.length" :headers="tableHeaders">
         <template #default>
           <tr v-for="(product, index) in products" :key="index" class="child:px-16">
@@ -38,7 +38,7 @@
             <td>{{ product.count }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
               <button @click="detailHandler(product)">جزییات</button>
-              <button @click="deleteProduct(product.id)" class="mr-3">حذف</button>
+              <button @click="confirmAndDeleteProduct(product.id ?? undefined)" class="mr-3">حذف</button>
               <button @click="editHandler(product)" class="mr-3">ویرایش</button>
             </td>
           </tr>
@@ -47,44 +47,48 @@
       <NothingDiv v-else />
     </div>
 
-    <ModalPanel :isOpen="isModalDetailOpen" @close="isModalDetailOpen = false">
+    <DetailModal :isOpen="isModalDetailOpen" @close="isModalDetailOpen = false">
       <h3 class="text-2xl font-bold">جزئیات محصول</h3>
       <p>محبوبیت: {{ selectedProduct?.popularity }}</p>
       <p>تعداد رنگ: {{ selectedProduct?.colors }}</p>
       <p v-if="selectedProduct">مجموع فروش: {{ selectedProduct.sale?.toLocaleString() }}</p>
-    </ModalPanel>
+    </DetailModal>
 
-    <ModalPanel :isOpen="isEditHandlerOpen" @close="isEditHandlerOpen = false">
+    <EditModal :editsValue="editForm" :isOpen="isModalEditOpen" @close="isModalEditOpen = false">
       <h3 class="text-2xl font-bold mb-3">ویرایش محصول</h3>
-      <div
-        class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]"
-      >
-        <input v-model="editForm.title" type="text" placeholder="اسم محصول را بنویسید" />
-        <input v-model.number="editForm.price" type="text" placeholder="قیمت محصول را بنویسید" />
-        <input v-model.number="editForm.count" type="text" placeholder="موجودی محصول را بنویسید" />
-        <input v-model="editForm.img" type="text" placeholder="آدرس محصول را بنویسید" />
-        <input
-          v-model.number="editForm.popularity"
-          type="text"
-          placeholder="میزان محبوبیت محصول را بنویسید"
-        />
-        <input v-model.number="editForm.sale" type="text" placeholder="میزان فروش محصول را بنویسید" />
-        <input
-          v-model.number="editForm.colors"
-          type="text"
-          placeholder="تعداد رنگ بندی محصول را بنویسید"
-        />
-      </div>
-    </ModalPanel>
+        <div
+          class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]"
+        >
+          <input v-model="editForm.title" type="text" placeholder="اسم محصول را بنویسید" />
+          <input v-model.number="editForm.price" type="text" placeholder="قیمت محصول را بنویسید" />
+          <input v-model.number="editForm.count" type="text" placeholder="موجودی محصول را بنویسید" />
+          <input v-model="editForm.img" type="text" placeholder="آدرس محصول را بنویسید" />
+          <input
+            v-model.number="editForm.popularity"
+            type="text"
+            placeholder="میزان محبوبیت محصول را بنویسید"
+          />
+          <input v-model.number="editForm.sale" type="text" placeholder="میزان فروش محصول را بنویسید" />
+          <input
+            v-model.number="editForm.colors"
+            type="text"
+            placeholder="تعداد رنگ بندی محصول را بنویسید"
+          />
+        </div>
+    </EditModal>
   </div>
 </template>
 
 <script lang="ts" setup>
+
 import NothingDiv from '../components/NothingDiv.vue'
 import TablePanel from '../components/TablePanel.vue'
-import ModalPanel from '../components/ModalPanel.vue'
+import DetailModal from '../components/Modal/DetailModal.vue'
+import EditModal from '../components/Modal/EditModal.vue'
+
 import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
+
 
 interface ProductInfo {
   id?: number | null
@@ -108,6 +112,7 @@ const form = ref<ProductInfo>({
   colors: null
 })
 const editForm = ref<ProductInfo>({
+  id: null,
   title: '',
   price: null,
   count: null,
@@ -120,7 +125,7 @@ const editForm = ref<ProductInfo>({
 const tableHeaders = ref<string[]>(['عکس', 'اسم', 'قیمت', 'موجودی'])
 const products = ref<ProductInfo[]>([])
 const isModalDetailOpen = ref<boolean>(false)
-const isEditHandlerOpen = ref<boolean>(false)
+const isModalEditOpen = ref<boolean>(false)
 const selectedProduct = ref<ProductInfo | null>(null)
 
 onMounted(() => {
@@ -171,17 +176,20 @@ const submitProduct = async () => {
   }
 }
 
-const deleteProduct = (id: number) => {
+const confirmAndDeleteProduct = (id: number | undefined) => {
+  if (id === undefined) {
+    console.warn('Product ID is undefined');
+    return;
+  }
+
   Swal.fire({
-    title: 'آیا مطئمن به حذف هستید',
+    title: 'آیا مطمئن به حذف هستید؟',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: 'بله',
     cancelButtonText: 'خیر'
-  }).then((resault) => {
-    if (resault.value) {
-      console.log(resault.value)
-      console.log(id)
+  }).then((result) => {
+    if (result.isConfirmed) {
       try {
         fetch(`http://localhost:8000/api/products/${id}`, {
           method: 'DELETE',
@@ -193,18 +201,18 @@ const deleteProduct = (id: number) => {
             title: 'عملیات موفق آمیز بود',
             icon: 'success',
             confirmButtonText: 'تایید'
-          }).then(() => fetchProducts())
-        })
+          })
+        }).then(() => fetchProducts())
       } catch (error) {
-        console.error('Error submitting product:', error)
+        console.error('Error deleting product:', error);
         Swal.fire({
           title: 'خطا',
-          text: 'خطا در ثبت محصول',
+          text: 'خطا در حذف محصول',
           icon: 'error'
-        })
+        });
       }
     }
-  })
+  });
 }
 
 const detailHandler = (product: ProductInfo) => {
@@ -213,8 +221,9 @@ const detailHandler = (product: ProductInfo) => {
 }
 
 const editHandler = (product: ProductInfo) => {
-  isEditHandlerOpen.value = true
+  isModalEditOpen.value = true
   editForm.value = {
+    id : product.id,
     title : product.title,
     img: product.img,
     count : product.count,
@@ -239,5 +248,5 @@ const resetForm = () => {
 }
 </script>
 
-<style >
+<style scoped>
 </style>
