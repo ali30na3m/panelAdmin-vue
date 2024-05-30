@@ -1,6 +1,6 @@
 <template>
   <div class="text-center py-10 bg-red-500">
-    <p class="text-white">پروداکتی وجود ندارد</p>
+    <p class="text-white">آیتمی وجود ندارد</p>
   </div>
 </template>
 

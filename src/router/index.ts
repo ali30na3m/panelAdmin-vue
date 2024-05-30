@@ -4,6 +4,7 @@ import Home from '@/views/HomePanel.vue';
 import Product from '@/views/ProductPanel.vue';
 import Comments from '@/views/CommentsPanel.vue';
 import Users from '@/views/UsersPanel.vue';
+import Orders from '@/views/OrdersPanel.vue';
 import Offers from '@/views/OffersPanel.vue';
 
 interface RouterInfo {
@@ -36,7 +37,7 @@ const routes: RouterInfo[] = [
     {
         path: '/orders',
         name: 'OrdersPanel',
-        component: Users as Component
+        component: Orders as Component
     },
     {
         path: '/offers',

@@ -92,9 +92,9 @@
 
 <script lang="ts" setup>
 import NothingDiv from '../components/NothingDiv.vue'
-import TablePanel from '../components/TablePanel.vue'
-import DetailModal from '../components/Modal/DetailModal.vue'
-import EditModal from '../components/Modal/EditModal.vue'
+import TablePanel from '@/components/TablePanel.vue'
+import DetailModal from '@/components/Modal/DetailModal.vue'
+import EditModal from '@/components/Modal/EditModal.vue'
 
 import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
