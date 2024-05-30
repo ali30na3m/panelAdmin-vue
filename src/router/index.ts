@@ -5,7 +5,7 @@ import Product from '@/views/ProductPanel.vue';
 import Comments from '@/views/CommentsPanel.vue';
 import Users from '@/views/UsersPanel.vue';
 import Orders from '@/views/OrdersPanel.vue';
-import Offers from '@/views/OffersPanel.vue';
+import Offs from '@/views/OffsPanel.vue';
 
 interface RouterInfo {
     path: string;
@@ -40,9 +40,9 @@ const routes: RouterInfo[] = [
         component: Orders as Component
     },
     {
-        path: '/offers',
-        name: 'OffersPanel',
-        component: Offers as Component
+        path: '/offs',
+        name: 'OffsPanel',
+        component: Offs as Component
     },
 ];
 

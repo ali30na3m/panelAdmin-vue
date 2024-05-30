@@ -10,7 +10,7 @@
             <td>{{ user.phone }}</td>
             <td>{{ user.email }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <button @click="confirmAndDeleteProduct(user.id ?? undefined)">حذف</button>
+              <button @click="confirmAndDeleteUsers(user.id ?? undefined)">حذف</button>
               <button @click="detailHandler(user)" class="mr-3">جزییات</button>
               <button @click="editHandler(user)" class="mr-3">ویرایش</button>
             </td>
@@ -108,9 +108,9 @@ const fetchUsers = () => {
     })
 }
 
-const confirmAndDeleteProduct = (id: number | undefined) => {
+const confirmAndDeleteUsers = (id: number | undefined) => {
   if (id === undefined) {
-    console.warn('Product ID is undefined')
+    console.warn('Users ID is undefined')
     return
   }
   Swal.fire({

@@ -17,7 +17,7 @@
 </template>
 
 <script  lang="ts" setup>
-import TableHeader from '../components/TableForm/TableHeader.vue'
+import TableHeader from '@/components/TableForm/TableHeader.vue'
 
 defineProps<{
   headers: string[]

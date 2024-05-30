@@ -25,7 +25,7 @@
         <HomeOutlined />
         سفارشات
       </router-link>
-      <router-link to="/offers" active-class="active-link">
+      <router-link to="/offs" active-class="active-link">
         <HomeOutlined />
         تخفیفات
       </router-link>
