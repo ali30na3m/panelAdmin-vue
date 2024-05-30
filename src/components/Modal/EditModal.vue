@@ -2,13 +2,13 @@
   <div
     :class="[
       'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm transition duration-500',
-      props.isOpen ? 'opacity-100 z-50' : 'opacity-0 -z-50'
+      isOpen ? 'opacity-100 z-50' : 'opacity-0 -z-50'
     ]"
     @click="closeModal"
   >
     <div class="bg-white p-5 rounded-lg shadow-lg" @click.stop>
       <slot></slot>
-      <div class="flex items-center gap-3">
+      <div class="flex justify-center items-center gap-3">
         <button @click="editModal" class="mt-4 bg-green-500 text-white py-2 px-4 rounded-xl">
           ویرایش
         </button>
@@ -24,44 +24,58 @@
 import Swal from 'sweetalert2'
 import { defineProps, defineEmits, onMounted, onUnmounted } from 'vue'
 
-interface ProductInfo {
-  id?: number | null
-  title?: string
-  price?: number | null
-  count?: number | null
-  img?: string
-  popularity?: number | null
-  sale?: number | null
-  colors?: number | null
+interface EditModalProps {
+  url: string
+  isOpen: boolean
+  editsValue: {
+    id?: number | null
+    title?: string
+    price?: number | null
+    count?: number | null
+    img?: string
+    popularity?: number | null
+    sale?: number | null
+    colors?: number | null
+    body?: string
+  }
 }
 
-const props = defineProps<{ isOpen: boolean; editsValue: ProductInfo }>()
+const props = defineProps<EditModalProps>()
 const emit = defineEmits(['close'])
 
-const editModal = () => {
+
+
+const editModal = async () => {
   try {
-    fetch(`http://localhost:8000/api/products/${props.editsValue.id}`, {
+
+    if (!props.editsValue.id) {
+      throw new Error('Invalid data')
+    }
+    const response = await fetch(`${props.url}${props.editsValue.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(props.editsValue)
-    }).then(() => {
-      Swal.fire({
-        title: 'عملیات موفق آمیز بود',
-        icon: 'success',
-        confirmButtonText: 'تایید'
-      })
     })
-  } catch (error) {
-    console.error('Error deleting product:', error)
+    if (!response.ok) throw new Error('Network response was not ok')
+
+    Swal.fire({
+      title: 'عملیات موفق آمیز بود',
+      icon: 'success',
+      confirmButtonText: 'تایید'
+    }).then(() => {
+      emit('close')
+    })
+  } 
+  catch (error) {
+    console.error('Error editing product:', error)
     Swal.fire({
       title: 'خطا',
-      text: 'خطا در حذف محصول',
+      text: 'خطا در ویرایش محصول',
       icon: 'error'
     })
   }
-  closeModal()
 }
 
 const closeModal = () => {
@@ -71,8 +85,8 @@ const closeModal = () => {
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape') {
     closeModal()
-  }else if(e.key === 'Enter') {
-     editModal()
+  } else if (e.key === 'Enter') {
+    editModal()
   }
 }
 
@@ -84,5 +98,6 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
 })
 </script>
+
 <style scoped>
 </style>

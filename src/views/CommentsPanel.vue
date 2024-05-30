@@ -4,7 +4,7 @@
     <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="comments.length" :headers="tableHeaders">
         <template #default>
-          <tr v-for="comment in comments" :key="comment.id" class="child:px-14">
+          <tr v-for="(comment, index) in comments" :key="index" class="child:px-14">
             <td>{{ comment.userID }}</td>
             <td>{{ comment.productID }}</td>
             <td>
@@ -18,9 +18,12 @@
             <td>{{ comment.date }}</td>
             <td>{{ comment.hour }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <button @click="removeComments(comment.id)">حذف</button>
-              <button @click="editComments(comment)" class="mr-2">ویرایش</button>
-              <button class="mr-2">تایید</button>
+              <button @click="removeComment(comment.id)">حذف</button>
+              <button @click="editComment(comment)" class="mr-2">ویرایش</button>
+              <button @click="acceptComment(comment.id)" v-if="comment.isAccept === 0" class="mr-2">
+                تایید
+              </button>
+              <button @click="rejectComment(comment.id)" v-else class="mr-2">رد</button>
             </td>
           </tr>
         </template>
@@ -30,7 +33,20 @@
         <h3 class="text-center text-2xl font-bold my-4">کامنت</h3>
         <p>{{ commentBody }}</p>
       </DetailModal>
-      <EditModal :editsValue="editForm" :isOpen="isEditModal" @close="isEditModal = false">
+      <EditModal
+        :url="urlEditModal"
+        :editsValue="editCommentData"
+        :isOpen="isEditModal"
+        @close="handleEditModalClose"
+      >
+        <template #default>
+          <h3 class="text-2xl font-bold mb-3">ویرایش کامنت</h3>
+          <div
+            class="child:w-[400px] child:h-[200px] child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]"
+          >
+            <textarea v-model="editCommentData.body" placeholder="کامنت را ویرایش کنید"></textarea>
+          </div>
+        </template>
       </EditModal>
     </div>
   </div>
@@ -44,9 +60,9 @@ import NothingDiv from '../components/NothingDiv.vue'
 import { onMounted, ref } from 'vue'
 import Swal from 'sweetalert2'
 
-interface commentInfo {
-  id?: number | null
-  productID?: number | string
+interface CommentInfo {
+  id: number | null
+  productID: number | string
   userID: string
   body: string
   date: string
@@ -55,19 +71,20 @@ interface commentInfo {
 }
 
 const tableHeaders = ref<string[]>(['اسم کاربر', 'محصول', 'کامنت', 'تاریخ', 'ساعت'])
-const comments = ref<commentInfo[]>([])
+const comments = ref<CommentInfo[]>([])
 const isCommentOpen = ref<boolean>(false)
 const isEditModal = ref<boolean>(false)
 const commentBody = ref<string>('')
+const urlEditModal = 'http://localhost:8000/api/comments/'
 
-const editForm = ref<commentInfo>({
+const editCommentData = ref<CommentInfo>({
   id: null,
+  productID: '',
+  userID: '',
   body: '',
   date: '',
   hour: '',
-  isAccept: null,
-  userID: '',
-  productID: ''
+  isAccept: null
 })
 
 onMounted(() => {
@@ -81,44 +98,48 @@ const fetchComments = async () => {
     const data = await response.json()
     comments.value = data
   } catch (error) {
-    console.error('Error fetching products:', error)
+    console.error('Error fetching comments:', error)
     Swal.fire({
       title: 'خطا',
-      text: 'خطا در بارگیری محصولات',
+      text: 'خطا در بارگیری کامنت‌ها',
       icon: 'error'
     })
   }
 }
 
-const removeComments = (id: number) => {
+const removeComment = async (id: number | null) => {
+  if (id === null) {
+    console.warn('Comment ID is null')
+    return
+  }
+
   Swal.fire({
     title: 'آیا مطمئن به حذف هستید؟',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: 'بله',
     cancelButtonText: 'خیر'
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        fetch(`http://localhost:8000/api/comments/${id}`, {
+        const response = await fetch(`http://localhost:8000/api/comments/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
           }
         })
-          .then(() => {
-            Swal.fire({
-              title: 'عملیات موفق آمیز بود',
-              icon: 'success',
-              confirmButtonText: 'تایید'
-            })
-          })
-          .then(() => fetchComments())
+        if (!response.ok) throw new Error('Network response was not ok')
+        await fetchComments()
+        Swal.fire({
+          title: 'عملیات موفق آمیز بود',
+          icon: 'success',
+          confirmButtonText: 'تایید'
+        })
       } catch (error) {
-        console.error('Error deleting product:', error)
+        console.error('Error deleting comment:', error)
         Swal.fire({
           title: 'خطا',
-          text: 'خطا در حذف محصول',
+          text: 'خطا در حذف کامنت',
           icon: 'error'
         })
       }
@@ -131,8 +152,71 @@ const showComment = (comment: string) => {
   commentBody.value = comment
 }
 
-const editComments = (commentInfos: commentInfo[]) => {}
+const editComment = (comment: CommentInfo) => {
+  isEditModal.value = true
+  editCommentData.value = { ...comment }
+}
+
+const handleEditModalClose = async () => {
+  isEditModal.value = false
+  await fetchComments() // Refresh the comments list after edit
+}
+
+const acceptComment = async (id: number | null) => {
+  if (id === null) return
+
+  try {
+    const response = await fetch(`http://localhost:8000/api/comments/accept/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (!response.ok) throw new Error('Network response was not ok')
+    await fetchComments()
+    Swal.fire({
+      title: 'کامنت تایید شد',
+      icon: 'success',
+      confirmButtonText: 'تایید'
+    })
+  } catch (error) {
+    console.error('Error accepting comment:', error)
+    Swal.fire({
+      title: 'خطا',
+      text: 'خطا در تایید کامنت',
+      icon: 'error'
+    })
+  }
+}
+
+const rejectComment = async (id: number | null) => {
+  if (id === null) return
+
+  try {
+    const response = await fetch(`http://localhost:8000/api/comments/reject/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (!response.ok) throw new Error('Network response was not ok')
+    await fetchComments()
+    Swal.fire({
+      title: 'کامنت رد شد',
+      icon: 'success',
+      confirmButtonText: 'تایید'
+    })
+  } catch (error) {
+    console.error('Error rejecting comment:', error)
+    Swal.fire({
+      title: 'خطا',
+      text: 'خطا در رد کامنت',
+      icon: 'error'
+    })
+  }
+}
 </script>
 
 <style>
+/* Add necessary styles here */
 </style>

@@ -56,7 +56,12 @@
       <p v-if="selectedProduct">مجموع فروش: {{ selectedProduct.sale?.toLocaleString() }}</p>
     </DetailModal>
 
-    <EditModal :editsValue="editForm" :isOpen="isModalEditOpen" @close="isModalEditOpen = false">
+    <EditModal
+      :url="urlEditModal"
+      :editsValue="editForm"
+      :isOpen="isModalEditOpen"
+      @close="handleEditModalClose"
+    >
       <h3 class="text-2xl font-bold mb-3">ویرایش محصول</h3>
       <div
         class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]"
@@ -95,7 +100,7 @@ import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
 
 interface ProductInfo {
-  id?: number | null
+  id: number | null
   title: string
   price: number | null
   count: number | null
@@ -131,6 +136,8 @@ const products = ref<ProductInfo[]>([])
 const isModalDetailOpen = ref<boolean>(false)
 const isModalEditOpen = ref<boolean>(false)
 const selectedProduct = ref<ProductInfo | null>(null)
+
+const urlEditModal = 'http://localhost:8000/api/products/'
 
 onMounted(() => {
   fetchProducts()
@@ -228,6 +235,7 @@ const detailHandler = (product: ProductInfo) => {
 const editHandler = (product: ProductInfo) => {
   isModalEditOpen.value = true
   editForm.value = {
+    ...editForm.value,
     id: product.id,
     title: product.title,
     img: product.img,
@@ -239,9 +247,14 @@ const editHandler = (product: ProductInfo) => {
   }
 }
 
+const handleEditModalClose = () => {
+  isModalEditOpen.value = false
+  fetchProducts() // Refresh the products list after edit
+}
+
 const resetForm = () => {
   form.value = {
-    id: 0,
+    id: null,
     title: '',
     price: null,
     count: null,
