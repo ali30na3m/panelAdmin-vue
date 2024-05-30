@@ -37,17 +37,25 @@ interface EditModalProps {
     sale?: number | null
     colors?: number | null
     body?: string
+    address?: string
+    buy?: number | null
+    city?: string
+    email?: string
+    firsname?: string
+    lastname?: string
+    password?: string
+    phone?: number | null
+    score?: number | null
+    username?: string
   }
 }
 
 const props = defineProps<EditModalProps>()
 const emit = defineEmits(['close'])
 
-
-
 const editModal = async () => {
   try {
-
+    console.log(props.editsValue.id);
     if (!props.editsValue.id) {
       throw new Error('Invalid data')
     }
@@ -67,8 +75,7 @@ const editModal = async () => {
     }).then(() => {
       emit('close')
     })
-  } 
-  catch (error) {
+  } catch (error) {
     console.error('Error editing product:', error)
     Swal.fire({
       title: 'خطا',

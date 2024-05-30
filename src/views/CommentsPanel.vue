@@ -4,7 +4,7 @@
     <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="comments.length" :headers="tableHeaders">
         <template #default>
-          <tr v-for="(comment, index) in comments" :key="index" class="child:px-14">
+          <tr v-for="(comment, index) in comments" :key="index" class="child:px-14 child:text-center">
             <td>{{ comment.userID }}</td>
             <td>{{ comment.productID }}</td>
             <td>

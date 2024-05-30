@@ -31,7 +31,7 @@
     <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="products.length" :headers="tableHeaders">
         <template #default>
-          <tr v-for="(product, index) in products" :key="index" class="child:px-14">
+          <tr v-for="(product, index) in products" :key="index" class="child:px-14 child:text-center">
             <td><img class="w-36 h-36" :src="product.img" alt="img" /></td>
             <td>{{ product.title }}</td>
             <td>{{ product.price?.toLocaleString() }}</td>
@@ -120,6 +120,7 @@ const form = ref<ProductInfo>({
   sale: null,
   colors: null
 })
+
 const editForm = ref<ProductInfo>({
   id: null,
   title: '',
@@ -249,7 +250,7 @@ const editHandler = (product: ProductInfo) => {
 
 const handleEditModalClose = () => {
   isModalEditOpen.value = false
-  fetchProducts() // Refresh the products list after edit
+  fetchProducts()
 }
 
 const resetForm = () => {
