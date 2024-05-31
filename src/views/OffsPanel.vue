@@ -10,9 +10,9 @@
             <td>{{off.percent}}</td>
             <td>{{off.date}}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <button @click="confirmAndDeleteOffs(off.id ?? undefined)" class="mr-3">
+              <DeleteButton :deleteID="off.id">
                 حذف
-              </button>
+              </DeleteButton>
               <button
                 v-if="off.isActive === 0"
                 @click="acceptComment(off.id ?? undefined)"
@@ -37,6 +37,7 @@
 </template>
 
 <script lang="ts" setup>
+import DeleteButton from '@/components/Buttons/DeleteButton.vue';
 import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
 import axios from 'axios'
@@ -44,7 +45,7 @@ import Swal from 'sweetalert2';
 import { onMounted, ref } from 'vue'
 
 interface offInfo {
-  id ?: number | null
+  id : number | null
   adminID : string
   code: string
   date : string
@@ -64,43 +65,6 @@ const fetchOffs = () => {
   axios.get('http://localhost:8000/api/offs/').then((data) => {
     console.log(data.data)
     offs.value = data.data
-  })
-}
-
-const confirmAndDeleteOffs = (id : number |undefined) => {
-  if (id === undefined) {
-    console.warn('Product ID is undefined')
-    return
-  }
-
-  Swal.fire({
-    title: 'آیا مطمئن به حذف هستید؟',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'بله',
-    cancelButtonText: 'خیر'
-  }).then((resault) => {
-    if (resault.isConfirmed) {
-      try {
-        axios
-          .delete(`http://localhost:8000/api/offs/${id}`)
-          .then(() => {
-            Swal.fire({
-              title: 'عملیات موفق آمیز بود',
-              icon: 'success',
-              confirmButtonText: 'تایید'
-            })
-          })
-          .then(() => fetchOffs())
-      } catch (error) {
-        console.error('Error deleting product:', error)
-        Swal.fire({
-          title: 'خطا',
-          text: 'خطا در حذف محصول',
-          icon: 'error'
-        })
-      }
-    }
   })
 }
 

@@ -11,9 +11,9 @@
             <td>{{ order.price }}</td>
             <td>{{ order.off }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <button @click="confirmAndDeleteOrders(order.id ?? undefined)" class="mr-3">
+              <DeleteButton :deleteID="order.id">
                 حذف
-              </button>
+              </DeleteButton>
               <button
                 v-if="order.isActive === 0"
                 @click="acceptComment(order.id ?? undefined)"
@@ -38,6 +38,7 @@
 </template>
 
 <script lang="ts" setup>
+import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
 import axios from 'axios'
@@ -45,7 +46,7 @@ import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
 
 interface orderInfo {
-  id?: number | null
+  id: number | null
   count: number | null
   price: number | null
   date: string
@@ -70,43 +71,6 @@ const fetchOrders = () => {
   axios.get('http://localhost:8000/api/orders/').then((data) => {
     orders.value = data.data
     console.log(data.data)
-  })
-}
-
-const confirmAndDeleteOrders = (id: number | undefined) => {
-  if (id === undefined) {
-    console.warn('Orders ID is undefined')
-    return
-  }
-
-  Swal.fire({
-    title: 'آیا مطمئن به حذف هستید؟',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'بله',
-    cancelButtonText: 'خیر'
-  }).then((resault) => {
-    if (resault.isConfirmed) {
-      try {
-        axios
-          .delete(`http://localhost:8000/api/orders/${id}`)
-          .then(() => {
-            Swal.fire({
-              title: 'عملیات موفق آمیز بود',
-              icon: 'success',
-              confirmButtonText: 'تایید'
-            })
-          })
-          .then(() => fetchOrders())
-      } catch (error) {
-        console.error('Error deleting product:', error)
-        Swal.fire({
-          title: 'خطا',
-          text: 'خطا در حذف محصول',
-          icon: 'error'
-        })
-      }
-    }
   })
 }
 

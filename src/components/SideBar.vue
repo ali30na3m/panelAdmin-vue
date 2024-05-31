@@ -14,19 +14,19 @@
         محصولات
       </router-link>
       <router-link to="/comments" active-class="active-link">
-        <HomeOutlined />
+        <CommentOutlined /> 
         کامنت‌ها
       </router-link>
       <router-link to="/users" active-class="active-link">
-        <HomeOutlined />
+        <UserOutlined />
         کاربران
       </router-link>
       <router-link to="/orders" active-class="active-link">
-        <HomeOutlined />
+        <DollarOutlined />
         سفارشات
       </router-link>
       <router-link to="/offs" active-class="active-link">
-        <HomeOutlined />
+        <FallOutlined />
         تخفیفات
       </router-link>
     </div>
@@ -34,7 +34,7 @@
 </template>
   
 <script lang="ts" setup>
-import { HomeOutlined } from '@ant-design/icons-vue'
+import { CommentOutlined, DollarOutlined, FallOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons-vue'
 </script>
   
   <style scoped>

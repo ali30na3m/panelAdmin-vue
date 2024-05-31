@@ -38,9 +38,9 @@
             <td>{{ product.count }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
               <button @click="detailHandler(product)">جزییات</button>
-              <button @click="confirmAndDeleteProduct(product.id ?? undefined)" class="mr-3">
+              <DeleteButton class="mr-3" :deleteID="product.id">
                 حذف
-              </button>
+              </DeleteButton>
               <button @click="editHandler(product)" class="mr-3">ویرایش</button>
             </td>
           </tr>
@@ -91,10 +91,11 @@
 </template>
 
 <script lang="ts" setup>
-import NothingDiv from '../components/NothingDiv.vue'
+import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
 import DetailModal from '@/components/Modal/DetailModal.vue'
 import EditModal from '@/components/Modal/EditModal.vue'
+import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 
 import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
@@ -187,46 +188,7 @@ const submitProduct = async () => {
   resetForm()
 }
 
-const confirmAndDeleteProduct = (id: number | undefined) => {
-  if (id === undefined) {
-    console.warn('Product ID is undefined')
-    return
-  }
 
-  Swal.fire({
-    title: 'آیا مطمئن به حذف هستید؟',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'بله',
-    cancelButtonText: 'خیر'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      try {
-        fetch(`http://localhost:8000/api/products/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-          .then(() => {
-            Swal.fire({
-              title: 'عملیات موفق آمیز بود',
-              icon: 'success',
-              confirmButtonText: 'تایید'
-            })
-          })
-          .then(() => fetchProducts())
-      } catch (error) {
-        console.error('Error deleting product:', error)
-        Swal.fire({
-          title: 'خطا',
-          text: 'خطا در حذف محصول',
-          icon: 'error'
-        })
-      }
-    }
-  })
-}
 
 const detailHandler = (product: ProductInfo) => {
   selectedProduct.value = product

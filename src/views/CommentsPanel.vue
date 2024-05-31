@@ -18,7 +18,7 @@
             <td>{{ comment.date }}</td>
             <td>{{ comment.hour }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <button @click="removeComment(comment.id)">حذف</button>
+              <DeleteButton :deleteID="comment.id" >حذف</DeleteButton>
               <button @click="editComment(comment)" class="mr-2">ویرایش</button>
               <button @click="acceptComment(comment.id)" v-if="comment.isAccept === 0" class="mr-2">
                 تایید
@@ -29,7 +29,9 @@
         </template>
       </TablePanel>
       <NothingDiv v-else />
-      <DetailModal :isOpen="isCommentOpen" @close="isCommentOpen = false">
+      <DetailModal 
+      :isOpen="isCommentOpen" 
+      @close="isCommentOpen = false">
         <h3 class="text-center text-2xl font-bold my-4">کامنت</h3>
         <p>{{ commentBody }}</p>
       </DetailModal>
@@ -53,10 +55,11 @@
 </template>
 
 <script lang="ts" setup>
-import TablePanel from '../components/TablePanel.vue'
-import DetailModal from '../components/Modal/DetailModal.vue'
-import EditModal from '../components/Modal/EditModal.vue'
-import NothingDiv from '../components/NothingDiv.vue'
+import TablePanel from '@/components/TablePanel.vue'
+import DetailModal from '@/components/Modal/DetailModal.vue'
+import EditModal from '@/components/Modal/EditModal.vue'
+import NothingDiv from '@/components/NothingDiv.vue'
+import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import { onMounted, ref } from 'vue'
 import Swal from 'sweetalert2'
 
@@ -107,46 +110,6 @@ const fetchComments = async () => {
   }
 }
 
-const removeComment = async (id: number | null) => {
-  if (id === null) {
-    console.warn('Comment ID is null')
-    return
-  }
-
-  Swal.fire({
-    title: 'آیا مطمئن به حذف هستید؟',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'بله',
-    cancelButtonText: 'خیر'
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        const response = await fetch(`http://localhost:8000/api/comments/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        if (!response.ok) throw new Error('Network response was not ok')
-        await fetchComments()
-        Swal.fire({
-          title: 'عملیات موفق آمیز بود',
-          icon: 'success',
-          confirmButtonText: 'تایید'
-        })
-      } catch (error) {
-        console.error('Error deleting comment:', error)
-        Swal.fire({
-          title: 'خطا',
-          text: 'خطا در حذف کامنت',
-          icon: 'error'
-        })
-      }
-    }
-  })
-}
-
 const showComment = (comment: string) => {
   isCommentOpen.value = true
   commentBody.value = comment
@@ -159,7 +122,7 @@ const editComment = (comment: CommentInfo) => {
 
 const handleEditModalClose = async () => {
   isEditModal.value = false
-  await fetchComments() // Refresh the comments list after edit
+  await fetchComments() 
 }
 
 const acceptComment = async (id: number | null) => {
@@ -218,5 +181,5 @@ const rejectComment = async (id: number | null) => {
 </script>
 
 <style>
-/* Add necessary styles here */
+
 </style>

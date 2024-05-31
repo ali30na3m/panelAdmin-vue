@@ -10,7 +10,9 @@
             <td>{{ user.phone }}</td>
             <td>{{ user.email }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <button @click="confirmAndDeleteUsers(user.id ?? undefined)">حذف</button>
+              <DeleteButton :deleteID="user.id">
+                حذف
+              </DeleteButton>
               <button @click="detailHandler(user)" class="mr-3">جزییات</button>
               <button @click="editHandler(user)" class="mr-3">ویرایش</button>
             </td>
@@ -54,15 +56,16 @@
 </template>
 
 <script lang="ts" setup>
-import NothingDiv from '../components/NothingDiv.vue'
-import DetailModal from '../components/Modal/DetailModal.vue'
-import TablePanel from '../components/TablePanel.vue'
-import EditModal from '../components/Modal/EditModal.vue'
-import Swal from 'sweetalert2'
+import NothingDiv from '@/components/NothingDiv.vue'
+import DetailModal from '@/components/Modal/DetailModal.vue'
+import TablePanel from '@/components/TablePanel.vue'
+import EditModal from '@/components/Modal/EditModal.vue'
+import DeleteButton from '@/components/Buttons/DeleteButton.vue'
+
 import { onMounted, ref } from 'vue'
 
 interface userInfo {
-  id?: number | null
+  id: number | null
   address: string
   buy: number | null
   city: string
@@ -106,46 +109,6 @@ const fetchUsers = () => {
     .then((data) => {
       users.value = data
     })
-}
-
-const confirmAndDeleteUsers = (id: number | undefined) => {
-  if (id === undefined) {
-    console.warn('Users ID is undefined')
-    return
-  }
-  Swal.fire({
-    title: 'آیا مطمئن به حذف هستید؟',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'بله',
-    cancelButtonText: 'خیر'
-  }).then((resault) => {
-    if (resault.isConfirmed) {
-      try {
-        fetch(`http://localhost:8000/api/users/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-          .then(() => {
-            Swal.fire({
-              title: 'عملیات موفق آمیز بود',
-              icon: 'success',
-              confirmButtonText: 'تایید'
-            })
-          })
-          .then(() => fetchUsers())
-      } catch (error) {
-        console.error('Error deleting product:', error)
-        Swal.fire({
-          title: 'خطا',
-          text: 'خطا در حذف محصول',
-          icon: 'error'
-        })
-      }
-    }
-  })
 }
 
 const detailHandler = (user: userInfo) => {
