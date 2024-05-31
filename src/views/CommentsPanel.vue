@@ -4,7 +4,11 @@
     <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="comments.length" :headers="tableHeaders">
         <template #default>
-          <tr v-for="(comment, index) in comments" :key="index" class="child:px-14 child:text-center">
+          <tr
+            v-for="(comment, index) in comments"
+            :key="index"
+            class="child:px-14 child:text-center"
+          >
             <td>{{ comment.userID }}</td>
             <td>{{ comment.productID }}</td>
             <td>
@@ -18,7 +22,7 @@
             <td>{{ comment.date }}</td>
             <td>{{ comment.hour }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <DeleteButton :deleteID="comment.id" >حذف</DeleteButton>
+              <DeleteButton :deleteID="comment.id">حذف</DeleteButton>
               <button @click="editComment(comment)" class="mr-2">ویرایش</button>
               <button @click="acceptComment(comment.id)" v-if="comment.isAccept === 0" class="mr-2">
                 تایید
@@ -29,9 +33,7 @@
         </template>
       </TablePanel>
       <NothingDiv v-else />
-      <DetailModal 
-      :isOpen="isCommentOpen" 
-      @close="isCommentOpen = false">
+      <DetailModal :isOpen="isCommentOpen" @close="isCommentOpen = false">
         <h3 class="text-center text-2xl font-bold my-4">کامنت</h3>
         <p>{{ commentBody }}</p>
       </DetailModal>
@@ -60,18 +62,10 @@ import DetailModal from '@/components/Modal/DetailModal.vue'
 import EditModal from '@/components/Modal/EditModal.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
+import type { CommentInfo } from '@/components/types'
 import { onMounted, ref } from 'vue'
 import Swal from 'sweetalert2'
-
-interface CommentInfo {
-  id: number | null
-  productID: number | string
-  userID: string
-  body: string
-  date: string
-  hour: string
-  isAccept: number | null
-}
+import FetchApis from '@/api/Fetchapi'
 
 const tableHeaders = ref<string[]>(['اسم کاربر', 'محصول', 'کامنت', 'تاریخ', 'ساعت'])
 const comments = ref<CommentInfo[]>([])
@@ -90,25 +84,9 @@ const editCommentData = ref<CommentInfo>({
   isAccept: null
 })
 
-onMounted(() => {
-  fetchComments()
+onMounted(async () => {
+  comments.value = await FetchApis()
 })
-
-const fetchComments = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/comments/')
-    if (!response.ok) throw new Error('Network response was not ok')
-    const data = await response.json()
-    comments.value = data
-  } catch (error) {
-    console.error('Error fetching comments:', error)
-    Swal.fire({
-      title: 'خطا',
-      text: 'خطا در بارگیری کامنت‌ها',
-      icon: 'error'
-    })
-  }
-}
 
 const showComment = (comment: string) => {
   isCommentOpen.value = true
@@ -122,7 +100,7 @@ const editComment = (comment: CommentInfo) => {
 
 const handleEditModalClose = async () => {
   isEditModal.value = false
-  await fetchComments() 
+  await fetchComments()
 }
 
 const acceptComment = async (id: number | null) => {
@@ -181,5 +159,4 @@ const rejectComment = async (id: number | null) => {
 </script>
 
 <style>
-
 </style>

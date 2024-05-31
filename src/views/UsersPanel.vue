@@ -61,6 +61,7 @@ import DetailModal from '@/components/Modal/DetailModal.vue'
 import TablePanel from '@/components/TablePanel.vue'
 import EditModal from '@/components/Modal/EditModal.vue'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
+import FetchApis from '@/api/Fetchapi'
 
 import { onMounted, ref } from 'vue'
 
@@ -99,17 +100,10 @@ const editForm = ref<userInfo>({
 
 const urlEditModal = 'http://localhost:8000/api/users/'
 
-onMounted(() => {
-  fetchUsers()
+onMounted(async() => {
+  users.value = await FetchApis()
 })
 
-const fetchUsers = () => {
-  fetch('http://localhost:8000/api/users')
-    .then((res) => res.json())
-    .then((data) => {
-      users.value = data
-    })
-}
 
 const detailHandler = (user: userInfo) => {
   isModalDetailOpen.value = true
@@ -135,6 +129,6 @@ const editHandler = (user: userInfo) => {
 
 const handleEditModalClose = () => {
   isModalEditOpen.value = false
-  fetchUsers()
+  FetchApis()
 }
 </script>

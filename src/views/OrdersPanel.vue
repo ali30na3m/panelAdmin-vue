@@ -7,13 +7,11 @@
           <tr v-for="(order, index) in orders" :key="index" class="child:px-14 child:text-center">
             <td>{{ order.userID }}</td>
             <td>{{ order.productID }}</td>
-            <td>{{ order.date }}</td>
+            <td>{{ order.date.slice(0,10) }}</td>
             <td>{{ order.price }}</td>
             <td>{{ order.off }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <DeleteButton :deleteID="order.id">
-                حذف
-              </DeleteButton>
+              <DeleteButton :deleteID="order.id"> حذف </DeleteButton>
               <button
                 v-if="order.isActive === 0"
                 @click="acceptComment(order.id ?? undefined)"
@@ -21,13 +19,7 @@
               >
                 تایید
               </button>
-              <button
-                v-else
-                @click="rejectComment(order.id ?? undefined)"
-                class="mr-3"
-              >
-                رد
-              </button>
+              <button v-else @click="rejectComment(order.id ?? undefined)" class="mr-3">رد</button>
             </td>
           </tr>
         </template>
@@ -38,6 +30,7 @@
 </template>
 
 <script lang="ts" setup>
+import FetchApis from '@/api/Fetchapi'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
@@ -63,16 +56,9 @@ interface orderInfo {
 const orders = ref<orderInfo[]>([])
 const tableHeaders = ref<string[]>(['نام و نام خانوادگی', 'محصول', 'تاریخ', 'قیمت', 'تخفیف'])
 
-onMounted(() => {
-  fetchOrders()
+onMounted(async () => {
+  orders.value = await FetchApis()
 })
-
-const fetchOrders = () => {
-  axios.get('http://localhost:8000/api/orders/').then((data) => {
-    orders.value = data.data
-    console.log(data.data)
-  })
-}
 
 const acceptComment = (id: number | undefined) => {
   Swal.fire({
@@ -84,7 +70,8 @@ const acceptComment = (id: number | undefined) => {
   }).then((resault) => {
     if (resault.isConfirmed) {
       try {
-        axios.put(`http://localhost:8000/api/orders/active-order/${id}/1`)
+        axios
+          .put(`http://localhost:8000/api/orders/active-order/${id}/1`)
           .then(() => {
             Swal.fire({
               title: 'سفارش تایید شد',
@@ -92,7 +79,7 @@ const acceptComment = (id: number | undefined) => {
               confirmButtonText: 'تایید'
             })
           })
-          .then(() => fetchOrders())
+          .then(() => FetchApis())
       } catch (error) {
         console.log('Error accepting comment:', error)
         Swal.fire({
@@ -114,7 +101,8 @@ const rejectComment = (id: number | undefined) => {
   }).then((resault) => {
     if (resault.isConfirmed) {
       try {
-        axios.put(`http://localhost:8000/api/orders/active-order/${id}/0`)
+        axios
+          .put(`http://localhost:8000/api/orders/active-order/${id}/0`)
           .then(() => {
             Swal.fire({
               title: 'سفارش رد شد',
@@ -122,7 +110,7 @@ const rejectComment = (id: number | undefined) => {
               confirmButtonText: 'تایید'
             })
           })
-          .then(() => fetchOrders())
+          .then(() => FetchApis())
       } catch (error) {
         console.log('Error accepting comment:', error)
         Swal.fire({

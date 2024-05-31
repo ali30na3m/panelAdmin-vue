@@ -5,14 +5,12 @@
       <TablePanel v-if="offs.length" :headers="tableHeaders">
         <template #default>
           <tr v-for="(off, index) in offs" :key="index" class="child:px-14 child:text-center">
-            <td>{{off.productID}}</td>
-            <td>{{off.adminID}}</td>
-            <td>{{off.percent}}</td>
-            <td>{{off.date}}</td>
+            <td>{{ off.productID }}</td>
+            <td>{{ off.adminID }}</td>
+            <td>{{ off.percent }}</td>
+            <td>{{ off.date }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <DeleteButton :deleteID="off.id">
-                حذف
-              </DeleteButton>
+              <DeleteButton :deleteID="off.id"> حذف </DeleteButton>
               <button
                 v-if="off.isActive === 0"
                 @click="acceptComment(off.id ?? undefined)"
@@ -20,13 +18,7 @@
               >
                 تایید
               </button>
-              <button
-                v-else
-                @click="rejectComment(off.id ?? undefined)"
-                class="mr-3"
-              >
-                رد
-              </button>
+              <button v-else @click="rejectComment(off.id ?? undefined)" class="mr-3">رد</button>
             </td>
           </tr>
         </template>
@@ -37,38 +29,32 @@
 </template>
 
 <script lang="ts" setup>
-import DeleteButton from '@/components/Buttons/DeleteButton.vue';
+import FetchApis from '@/api/Fetchapi'
+import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
 import axios from 'axios'
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
 
 interface offInfo {
-  id : number | null
-  adminID : string
+  id: number | null
+  adminID: string
   code: string
-  date : string
-  isActive : number | null
-  percent : number | null
-  productID : string
+  date: string
+  isActive: number | null
+  percent: number | null
+  productID: string
 }
 
-const tableHeaders = ref<string[]>(["محصول","ادمین","درصد","تاریخ"]) 
+const tableHeaders = ref<string[]>(['محصول', 'ادمین', 'درصد', 'تاریخ'])
 const offs = ref<offInfo[]>([])
 
-onMounted(() => {
-  fetchOffs()
+onMounted(async () => {
+  offs.value = await FetchApis()
 })
 
-const fetchOffs = () => {
-  axios.get('http://localhost:8000/api/offs/').then((data) => {
-    console.log(data.data)
-    offs.value = data.data
-  })
-}
-
-const acceptComment = (id : number | undefined) => {
+const acceptComment = (id: number | undefined) => {
   Swal.fire({
     title: 'آیا مطمئن به تایید کردن هستید؟',
     icon: 'warning',
@@ -78,7 +64,8 @@ const acceptComment = (id : number | undefined) => {
   }).then((resault) => {
     if (resault.isConfirmed) {
       try {
-        axios.put(`http://localhost:8000/api/offs/active-off/${id}/1`)
+        axios
+          .put(`http://localhost:8000/api/offs/active-off/${id}/1`)
           .then(() => {
             Swal.fire({
               title: 'سفارش تایید شد',
@@ -86,7 +73,7 @@ const acceptComment = (id : number | undefined) => {
               confirmButtonText: 'تایید'
             })
           })
-          .then(() => fetchOffs())
+          .then(() => FetchApis())
       } catch (error) {
         console.log('Error accepting comment:', error)
         Swal.fire({
@@ -99,7 +86,7 @@ const acceptComment = (id : number | undefined) => {
   })
 }
 
-const rejectComment = (id : number | undefined) => {
+const rejectComment = (id: number | undefined) => {
   Swal.fire({
     title: 'آیا مطمئن به رد کردن هستید؟',
     icon: 'warning',
@@ -109,7 +96,8 @@ const rejectComment = (id : number | undefined) => {
   }).then((resault) => {
     if (resault.isConfirmed) {
       try {
-        axios.put(`http://localhost:8000/api/offs/active-off/${id}/0`)
+        axios
+          .put(`http://localhost:8000/api/offs/active-off/${id}/0`)
           .then(() => {
             Swal.fire({
               title: 'سفارش رد شد',
@@ -117,7 +105,7 @@ const rejectComment = (id : number | undefined) => {
               confirmButtonText: 'تایید'
             })
           })
-          .then(() => fetchOffs())
+          .then(() => FetchApis())
       } catch (error) {
         console.log('Error accepting comment:', error)
         Swal.fire({

@@ -10,7 +10,7 @@ import Swal from 'sweetalert2'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const idRoute = route.fullPath
+const params = route.fullPath
 const props = defineProps<{ deleteID: number | null }>()
 
 const removeComment = async (id: number | null) => {
@@ -24,7 +24,7 @@ const removeComment = async (id: number | null) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        axios.delete(`http://localhost:8000/api${idRoute}/${id}`)
+        axios.delete(`http://localhost:8000/api${params}/${id}`)
         Swal.fire({
           title: 'عملیات موفق آمیز بود',
           icon: 'success',
