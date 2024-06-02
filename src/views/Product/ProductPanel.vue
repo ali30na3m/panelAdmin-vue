@@ -2,23 +2,40 @@
   <div>
     <h2 class="text-3xl font-extrabold">افزودن محصول جدید</h2>
     <div class="mt-5 py-5 px-7 bg-white rounded-xl">
-      <div class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]">
+      <div
+        class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]"
+      >
         <input v-model="form.title" type="text" placeholder="اسم محصول را بنویسید" />
         <input v-model.number="form.price" type="text" placeholder="قیمت محصول را بنویسید" />
         <input v-model.number="form.count" type="text" placeholder="موجودی محصول را بنویسید" />
         <input v-model="form.img" type="text" placeholder="آدرس محصول را بنویسید" />
-        <input v-model.number="form.popularity" type="text" placeholder="میزان محبوبیت محصول را بنویسید" />
+        <input
+          v-model.number="form.popularity"
+          type="text"
+          placeholder="میزان محبوبیت محصول را بنویسید"
+        />
         <input v-model.number="form.sale" type="text" placeholder="میزان فروش محصول را بنویسید" />
-        <input v-model.number="form.colors" type="text" placeholder="تعداد رنگ بندی محصول را بنویسید" />
+        <input
+          v-model.number="form.colors"
+          type="text"
+          placeholder="تعداد رنگ بندی محصول را بنویسید"
+        />
       </div>
-      <button @click.prevent="submitProduct" class="mt-4 bg-pinkSecondary py-2 px-3 rounded-xl text-white">
+      <button
+        @click.prevent="submitProduct"
+        class="mt-4 bg-pinkSecondary py-2 px-3 rounded-xl text-white"
+      >
         ثبت محصول
       </button>
     </div>
     <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="products.length" :headers="tableHeaders">
         <template #default>
-          <tr v-for="(product, index) in products" :key="index" class="child:px-14 child:text-center">
+          <tr
+            v-for="(product, index) in products"
+            :key="index"
+            class="child:px-14 child:text-center"
+          >
             <td><img class="w-36 h-36" :src="product.img" alt="img" /></td>
             <td>{{ product.title }}</td>
             <td>{{ product.price?.toLocaleString() }}</td>
@@ -41,32 +58,58 @@
       <p v-if="selectedProduct">مجموع فروش: {{ selectedProduct.sale?.toLocaleString() }}</p>
     </DetailModal>
 
-    <EditModal :url="urlEditModal" :editsValue="editForm" :isOpen="isModalEditOpen" @close="handleEditModalClose">
+    <EditModal
+      :url="urlEditModal"
+      :editsValue="editForm"
+      :isOpen="isModalEditOpen"
+      @mutate="mutateFunc"
+      @close="handleEditModalClose"
+    >
       <h3 class="text-2xl font-bold mb-3">ویرایش محصول</h3>
-      <div class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]">
+      <div
+        class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]"
+      >
         <input v-model="editForm.title" type="text" placeholder="اسم محصول را بنویسید" />
         <input v-model.number="editForm.price" type="text" placeholder="قیمت محصول را بنویسید" />
         <input v-model.number="editForm.count" type="text" placeholder="موجودی محصول را بنویسید" />
         <input v-model="editForm.img" type="text" placeholder="آدرس محصول را بنویسید" />
-        <input v-model.number="editForm.popularity" type="text" placeholder="میزان محبوبیت محصول را بنویسید" />
-        <input v-model.number="editForm.sale" type="text" placeholder="میزان فروش محصول را بنویسید" />
-        <input v-model.number="editForm.colors" type="text" placeholder="تعداد رنگ بندی محصول را بنویسید" />
+        <input
+          v-model.number="editForm.popularity"
+          type="text"
+          placeholder="میزان محبوبیت محصول را بنویسید"
+        />
+        <input
+          v-model.number="editForm.sale"
+          type="text"
+          placeholder="میزان فروش محصول را بنویسید"
+        />
+        <input
+          v-model.number="editForm.colors"
+          type="text"
+          placeholder="تعداد رنگ بندی محصول را بنویسید"
+        />
       </div>
     </EditModal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import NothingDiv from '@/components/NothingDiv.vue';
-import TablePanel from '@/components/TablePanel.vue';
-import DetailModal from '@/components/Modal/DetailModal.vue';
-import EditModal from '@/components/Modal/EditModal.vue';
-import DeleteButton from '@/components/Buttons/DeleteButton.vue';
-import FetchApis from '@/api/Fetchapi.ts';
-import type { ProductInfo } from '@/components/types';
+import NothingDiv from '@/components/NothingDiv.vue'
+import TablePanel from '@/components/TablePanel.vue'
+import DetailModal from '@/components/Modal/DetailModal.vue'
+import EditModal from '@/components/Modal/EditModal/EditModal.vue'
+import DeleteButton from '@/components/Buttons/DeleteButton.vue'
+import FetchApis from '@/api/Fetchapi.ts'
 
-import Swal from 'sweetalert2';
-import { onMounted, ref } from 'vue';
+import type { ProductInfo } from './type'
+
+import { useRoute } from 'vue-router'
+
+import { onMounted, ref } from 'vue'
+
+import Swal from 'sweetalert2'
+
+const routes = useRoute()
 
 const form = ref<ProductInfo>({
   id: null,
@@ -77,7 +120,7 @@ const form = ref<ProductInfo>({
   popularity: null,
   sale: null,
   colors: null
-});
+})
 
 const editForm = ref<ProductInfo>({
   id: null,
@@ -88,19 +131,19 @@ const editForm = ref<ProductInfo>({
   popularity: null,
   sale: null,
   colors: null
-});
+})
 
-const tableHeaders = ref<string[]>(['عکس', 'اسم', 'قیمت', 'موجودی']);
-const products = ref<ProductInfo[]>([]);
-const isModalDetailOpen = ref<boolean>(false);
-const isModalEditOpen = ref<boolean>(false);
-const selectedProduct = ref<ProductInfo | null>(null);
+const tableHeaders = ref<string[]>(['عکس', 'اسم', 'قیمت', 'موجودی'])
+const products = ref<ProductInfo[]>([])
+const isModalDetailOpen = ref<boolean>(false)
+const selectedProduct = ref<ProductInfo | null>(null)
+const isModalEditOpen = ref<boolean>(false)
 
-const urlEditModal = 'http://localhost:8000/api/products/';
+const urlEditModal = 'http://localhost:8000/api/products/'
 
 onMounted(async () => {
-  products.value = await FetchApis();
-});
+  products.value = await FetchApis(routes)
+})
 
 const submitProduct = async () => {
   try {
@@ -110,34 +153,34 @@ const submitProduct = async () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(form.value)
-    });
-    if (!response.ok) throw new Error('Network response was not ok');
-    const newProduct = await response.json();
-    products.value.push(newProduct);
+    })
+    if (!response.ok) throw new Error('Network response was not ok')
+    const newProduct = await response.json()
+    products.value.push(newProduct)
     Swal.fire({
       title: 'عملیات موفق آمیز بود',
       icon: 'success'
     }).then(async () => {
-      products.value = await FetchApis();
-    });
+      products.value = await FetchApis(routes)
+    })
   } catch (error) {
-    console.error('Error submitting product:', error);
+    console.error('Error submitting product:', error)
     Swal.fire({
       title: 'خطا',
       text: 'خطا در ثبت محصول',
       icon: 'error'
-    });
+    })
   }
-  resetForm();
-};
+  resetForm()
+}
 
 const detailHandler = (product: ProductInfo) => {
-  selectedProduct.value = product;
-  isModalDetailOpen.value = true;
-};
+  selectedProduct.value = product
+  isModalDetailOpen.value = true
+}
 
 const editHandler = (product: ProductInfo) => {
-  isModalEditOpen.value = true;
+  isModalEditOpen.value = true
   editForm.value = {
     ...editForm.value,
     id: product.id,
@@ -148,13 +191,23 @@ const editHandler = (product: ProductInfo) => {
     popularity: product.popularity,
     price: product.price,
     sale: product.sale
-  };
-};
+  }
+}
+
+const mutateFunc = (updatedProduct : ProductInfo) => {
+  const index = products.value.findIndex(product => product.id === updatedProduct.id)
+
+  if (index !== -1){
+    products.value[index] = updatedProduct
+  }else{
+    products.value.push(updatedProduct)
+  }
+}
 
 const handleEditModalClose = async () => {
-  isModalEditOpen.value = false;
-  products.value = await FetchApis();
-};
+  isModalEditOpen.value = false
+  products.value = await FetchApis(routes)
+}
 
 const resetForm = () => {
   form.value = {
@@ -166,8 +219,8 @@ const resetForm = () => {
     popularity: null,
     sale: null,
     colors: null
-  };
-};
+  }
+}
 </script>
 
 <style scoped>

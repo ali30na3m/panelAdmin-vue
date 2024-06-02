@@ -1,24 +1,22 @@
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import { useRoute } from 'vue-router';
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
-const FetchApis = async () => {
-    
-    const route = useRoute()
-    const params = route.fullPath
+const fetchApis = async (route: RouteLocationNormalizedLoaded) => {
+  const endpoint = `http://localhost:8000/api${route.path}/`
 
   try {
-    const response = await axios.get(`http://localhost:8000/api${params}/`);
-    return response.data;
+    const response = await axios.get(endpoint)
+    return response.data
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error('Error fetching data:', error)
     Swal.fire({
       title: 'خطا',
-      text: 'خطا در بارگیری',
+      text: 'خطا در بارگیری داده‌ها',
       icon: 'error'
-    });
-    return [];
+    })
+    return []
   }
-};
+}
 
-export default FetchApis;
+export default fetchApis

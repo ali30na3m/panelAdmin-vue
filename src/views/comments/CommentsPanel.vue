@@ -41,6 +41,7 @@
         :url="urlEditModal"
         :editsValue="editCommentData"
         :isOpen="isEditModal"
+        @mutate="mutateFunc"
         @close="handleEditModalClose"
       >
         <template #default>
@@ -57,15 +58,20 @@
 </template>
 
 <script lang="ts" setup>
+import FetchApis from '@/api/Fetchapi'
+
 import TablePanel from '@/components/TablePanel.vue'
 import DetailModal from '@/components/Modal/DetailModal.vue'
-import EditModal from '@/components/Modal/EditModal.vue'
+import EditModal from '@/components/Modal/EditModal/EditModal.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
-import type { CommentInfo } from '@/components/types'
+
 import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+
+import type { CommentInfo } from './type' 
+
 import Swal from 'sweetalert2'
-import FetchApis from '@/api/Fetchapi'
 
 const tableHeaders = ref<string[]>(['اسم کاربر', 'محصول', 'کامنت', 'تاریخ', 'ساعت'])
 const comments = ref<CommentInfo[]>([])
@@ -84,8 +90,10 @@ const editCommentData = ref<CommentInfo>({
   isAccept: null
 })
 
+const route = useRoute()
+
 onMounted(async () => {
-  comments.value = await FetchApis()
+  comments.value = await FetchApis(route)
 })
 
 const showComment = (comment: string) => {
@@ -100,7 +108,15 @@ const editComment = (comment: CommentInfo) => {
 
 const handleEditModalClose = async () => {
   isEditModal.value = false
-  await fetchComments()
+  await FetchApis(route)
+}
+const mutateFunc = (updatedComment: CommentInfo) => {
+  const index = comments.value.findIndex((comment) => comment.id === updatedComment.id)
+  if (index !== -1) {
+    comments.value[index] = { ...updatedComment }
+  } else {
+    comments.value.push(updatedComment)
+  }
 }
 
 const acceptComment = async (id: number | null) => {
@@ -114,7 +130,7 @@ const acceptComment = async (id: number | null) => {
       }
     })
     if (!response.ok) throw new Error('Network response was not ok')
-    await fetchComments()
+    await FetchApis(route)
     Swal.fire({
       title: 'کامنت تایید شد',
       icon: 'success',
@@ -141,7 +157,7 @@ const rejectComment = async (id: number | null) => {
       }
     })
     if (!response.ok) throw new Error('Network response was not ok')
-    await fetchComments()
+    await FetchApis(route)
     Swal.fire({
       title: 'کامنت رد شد',
       icon: 'success',

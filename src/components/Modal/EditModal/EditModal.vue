@@ -24,38 +24,13 @@
 import Swal from 'sweetalert2'
 import { defineProps, defineEmits, onMounted, onUnmounted } from 'vue'
 
-interface EditModalProps {
-  url: string
-  isOpen: boolean
-  editsValue: {
-    id?: number | null
-    title?: string
-    price?: number | null
-    count?: number | null
-    img?: string
-    popularity?: number | null
-    sale?: number | null
-    colors?: number | null
-    body?: string
-    address?: string
-    buy?: number | null
-    city?: string
-    email?: string
-    firsname?: string
-    lastname?: string
-    password?: string
-    phone?: number | null
-    score?: number | null
-    username?: string
-  }
-}
+import type { EditModalProps } from './Type';
 
 const props = defineProps<EditModalProps>()
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'mutate'])
 
 const editModal = async () => {
   try {
-    console.log(props.editsValue.id);
     if (!props.editsValue.id) {
       throw new Error('Invalid data')
     }
@@ -67,13 +42,13 @@ const editModal = async () => {
       body: JSON.stringify(props.editsValue)
     })
     if (!response.ok) throw new Error('Network response was not ok')
-
     Swal.fire({
       title: 'عملیات موفق آمیز بود',
       icon: 'success',
       confirmButtonText: 'تایید'
     }).then(() => {
       emit('close')
+      emit('mutate', props.editsValue)
     })
   } catch (error) {
     console.error('Error editing product:', error)

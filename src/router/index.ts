@@ -1,48 +1,73 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { Component } from 'vue'; 
 import Home from '@/views/HomePanel.vue';
-import Product from '@/views/ProductPanel.vue';
-import Comments from '@/views/CommentsPanel.vue';
-import Users from '@/views/UsersPanel.vue';
-import Orders from '@/views/OrdersPanel.vue';
-import Offs from '@/views/OffsPanel.vue';
+import Product from '@/views/Product/ProductPanel.vue';
+import Comments from '@/views/comments/CommentsPanel.vue';
+import Users from '@/views/users/UsersPanel.vue';
+import Orders from '@/views/orders/OrdersPanel.vue';
+import Offs from '@/views/offs/OffsPanel.vue';
+import {
+  CommentOutlined,
+  DollarOutlined,
+  FallOutlined,
+  HomeOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
 
-interface RouterInfo {
-    path: string;
-    name: string;
-    component: Component;
-}
-
-const routes: RouterInfo[] = [
+export const routes = [
     {
         path: '/',
-        name: 'HomePanel',
-        component: Home as Component
+        name: 'خانه',
+        component: Home as Component ,
+        meta : {
+            isSideBar : true,
+            icon: HomeOutlined
+        }
     },
     {
         path: '/products',
-        name: 'ProductsPanel',
-        component: Product as Component
+        name: 'محصولات',
+        component: Product as Component,
+        meta : {
+            isSideBar : true,
+            icon: DollarOutlined 
+        }
     },
     {
         path: '/comments',
-        name: 'CommentsPanel',
-        component: Comments as Component
+        name: 'کامنت ها',
+        component: Comments as Component,
+        meta : {
+            isSideBar : true,
+            icon: CommentOutlined 
+        }
     },
     {
         path: '/users',
-        name: 'UsersPanel',
-        component: Users as Component
+        name: 'کاربران',
+        component: Users as Component,
+        meta : {
+            isSideBar : true,
+            icon: UserOutlined 
+        }
     },
     {
         path: '/orders',
-        name: 'OrdersPanel',
-        component: Orders as Component
+        name: 'سفارشات',
+        component: Orders as Component,
+        meta : {
+            isSideBar : true,
+            icon: DollarOutlined 
+        }
     },
     {
         path: '/offs',
-        name: 'OffsPanel',
-        component: Offs as Component
+        name: 'تخفیفات',
+        component: Offs as Component,
+        meta : {
+            isSideBar : true,
+            icon: FallOutlined
+        }
     },
 ];
 

@@ -2,44 +2,32 @@
   <div class="fixed top-0 right-0 bottom-0 py-3 px-3 bg-pinkSecondary text-white">
     <h2 class="">به پنل ادمین خوش آمدید</h2>
     <span class="block h-[1px] bg-white my-3"></span>
-    <div
-      class="flex flex-col gap-2 text-right child:flex child:items-center child:gap-2 child:p-2 child:px-1 child:rounded-lg child: hover:child:bg-purpleSecondary"
-    >
-      <router-link to="/" active-class="active-link">
-        <HomeOutlined />
-        خانه
-      </router-link>
-      <router-link to="/products" active-class="active-link">
-        <HomeOutlined />
-        محصولات
-      </router-link>
-      <router-link to="/comments" active-class="active-link">
-        <CommentOutlined /> 
-        کامنت‌ها
-      </router-link>
-      <router-link to="/users" active-class="active-link">
-        <UserOutlined />
-        کاربران
-      </router-link>
-      <router-link to="/orders" active-class="active-link">
-        <DollarOutlined />
-        سفارشات
-      </router-link>
-      <router-link to="/offs" active-class="active-link">
-        <FallOutlined />
-        تخفیفات
+    <div class="flex flex-col gap-2 text-right">
+      <router-link
+        v-for="router in filteredRoutes"
+        :key="router.name"
+        :to="router.path"
+        class="flex items-center gap-2 p-2 px-1 rounded-lg hover:bg-purpleSecondary"
+        active-class="active-link"
+      >
+        {{ router.name }}
       </router-link>
     </div>
   </div>
 </template>
-  
+
 <script lang="ts" setup>
-import { CommentOutlined, DollarOutlined, FallOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { routes } from '@/router/index';
+import { computed } from 'vue';
+
+const filteredRoutes = computed(() => {
+  return routes.filter(route => route.meta.isSideBar);
+});
+
 </script>
-  
-  <style scoped>
+
+<style scoped>
 .active-link {
   background-color: #391588;
 }
 </style>
-  
