@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 class="text-3xl font-extrabold">کامنت ها</h2>
-    <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
+    <div class="box-Panel bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="comments.length" :headers="tableHeaders">
         <template #default>
           <tr

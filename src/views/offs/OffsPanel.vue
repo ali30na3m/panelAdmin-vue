@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 class="text-3xl font-extrabold">تخفیفات</h2>
-    <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
+    <div class="box-Panel bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="offs.length" :headers="tableHeaders">
         <template #default>
           <tr v-for="(off, index) in offs" :key="index" class="child:px-14 child:text-center">
@@ -32,7 +32,7 @@
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
-import { getApi, postApi } from '@/api'
+import { getApi, putApi } from '@/api'
 import type { offInfo } from './type'
 
 import { onMounted, ref } from 'vue'
@@ -64,7 +64,7 @@ const acceptComment = (id: number | undefined) => {
   }).then(async (resault) => {
     if (resault.isConfirmed) {
       try {
-        await postApi(`offs/active-off/${id}/1`)
+        await putApi(`offs/active-off/${id}/1`)
         Swal.fire({
           title: 'سفارش تایید شد',
           icon: 'success',
@@ -92,7 +92,7 @@ const rejectComment = (id: number | undefined) => {
   }).then(async (resault) => {
     if (resault.isConfirmed) {
       try {
-        await postApi(`offs/active-off/${id}/0`)
+        await putApi(`offs/active-off/${id}/0`)
         Swal.fire({
           title: 'سفارش رد شد',
           icon: 'success',

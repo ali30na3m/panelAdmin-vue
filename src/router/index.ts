@@ -1,23 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { Component } from 'vue'
-import Home from '@/views/HomePanel.vue'
 import Product from '@/views/Product/ProductPanel.vue'
 import Comments from '@/views/comments/CommentsPanel.vue'
 import Users from '@/views/users/UsersPanel.vue'
 import Orders from '@/views/orders/OrdersPanel.vue'
 import Offs from '@/views/offs/OffsPanel.vue'
-import { faHouse, faBasketShopping, faComment, faUser, faArrowRightArrowLeft, faDollar } from '@fortawesome/free-solid-svg-icons' 
+import { faBasketShopping, faComment, faUser, faArrowRightArrowLeft, faDollar } from '@fortawesome/free-solid-svg-icons' 
 
 export const routes = [
-  {
-    path: '/',
-    name: 'خانه',
-    component: Home as Component,
-    icon:faHouse,
-    meta: {
-      isSideBar: true
-    }
-  },
   {
     path: '/products',
     name: 'محصولات',

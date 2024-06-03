@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 class="text-3xl font-extrabold">افزودن محصول جدید</h2>
-    <div class="mt-5 py-5 px-7 bg-white rounded-xl">
+    <div class="box-Panel mt-5 py-5 px-7 bg-white rounded-xl">
       <div
         class="grid grid-cols-2 gap-5 child:py-3 child:px-5 child:rounded-xl child:outline-none child:bg-[#f0f0f0]"
       >
@@ -28,7 +28,7 @@
         ثبت محصول
       </button>
     </div>
-    <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
+    <div class="box-Panel bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="products.length" :headers="tableHeaders">
         <template #default>
           <tr
@@ -42,7 +42,9 @@
             <td>{{ product.count }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
               <button @click="detailHandler(product)">جزییات</button>
-              <DeleteButton class="mr-3" @mutate="mutateDelete" :deleteID="product.id ?? null">حذف</DeleteButton>
+              <DeleteButton class="mr-3" @mutate="mutateDelete" :deleteID="product.id ?? null"
+                >حذف</DeleteButton
+              >
               <button @click="editHandler(product)" class="mr-3">ویرایش</button>
             </td>
           </tr>
@@ -100,31 +102,10 @@ import DetailModal from '@/components/Modal/DetailModal.vue'
 import EditModal from '@/components/Modal/EditModal/EditModal.vue'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import { getApi, postApi } from '@/api'
+import { form, editForm } from './utils'
 import type { ProductInfo } from './type'
 import { onMounted, ref } from 'vue'
 import Swal from 'sweetalert2'
-
-const form = ref<ProductInfo>({
-  id: null,
-  title: '',
-  price: null,
-  count: null,
-  img: '',
-  popularity: null,
-  sale: null,
-  colors: null
-})
-
-const editForm = ref<ProductInfo>({
-  id: null,
-  title: '',
-  price: null,
-  count: null,
-  img: '',
-  popularity: null,
-  sale: null,
-  colors: null
-})
 
 const tableHeaders = ref<string[]>(['عکس', 'اسم', 'قیمت', 'موجودی'])
 const products = ref<ProductInfo[]>([])
@@ -132,12 +113,12 @@ const isModalDetailOpen = ref<boolean>(false)
 const selectedProduct = ref<ProductInfo | null>(null)
 const isModalEditOpen = ref<boolean>(false)
 
-const fetchProducts = async() => {
-  await getApi('products').then(data => products.value = data)
+const fetchProducts = async () => {
+  await getApi('products').then((data) => (products.value = data))
 }
 
 onMounted(() => {
-    fetchProducts()
+  fetchProducts()
 })
 
 const submitProduct = async () => {
@@ -158,7 +139,6 @@ const submitProduct = async () => {
       icon: 'error'
     })
   }
-
 }
 
 const detailHandler = (product: ProductInfo) => {
@@ -181,12 +161,12 @@ const editHandler = (product: ProductInfo) => {
   }
 }
 
-const mutateFunc = (updatedProduct : ProductInfo) => {
-  const index = products.value.findIndex(product => product.id === updatedProduct.id)
+const mutateFunc = (updatedProduct: ProductInfo) => {
+  const index = products.value.findIndex((product) => product.id === updatedProduct.id)
 
-  if (index !== -1){
+  if (index !== -1) {
     products.value[index] = updatedProduct
-  }else{
+  } else {
     products.value.push(updatedProduct)
   }
 }

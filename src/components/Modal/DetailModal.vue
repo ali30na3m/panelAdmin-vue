@@ -6,7 +6,7 @@
     ]"
     @click="closeModal"
   >
-    <div class="bg-white p-5 rounded-lg shadow-lg" @click.stop>
+    <div class="box-Panel bg-white p-5 rounded-lg shadow-lg" @click.stop>
       <slot></slot>
       <button @click="closeModal" class="flex items-center justify-center mx-auto mt-4 bg-red-500 text-white py-2 px-4 rounded">بستن</button>
     </div>

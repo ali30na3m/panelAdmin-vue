@@ -1,28 +1,47 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base{
-    body {
-        background-color: #f0f0f0;
-        font-family: Dana;
-      }
-      @font-face {
-        font-family: "Dana";
-        src: local("Dana"), url(../fonts/Dana/woff2/DanaFaNum-Regular.woff2);
-        font-display: swap;
-      }
-    
-      @font-face {
-        font-family: "Dana Madium";
-        src: local("Dana Madium"), url(../../src/fonts/Dana/woff2/DanaFaNum-Medium.woff2);
-        font-display: swap;
-      }
-    
-      @font-face {
-        font-family: "Dana DemiBold";
-        src: local("Dana Bold"), url(../fonts/Dana/woff2/DanaFaNum-DemiBold.woff2);
-        font-display: swap;
-      }
+@layer base {
+  body {
+    @apply bg-[#f0f0f0] font-Dana dark:bg-zinc-800
+  }
+  @font-face {
+    font-family: 'Dana';
+    src: local('Dana'), url(../fonts/Dana/woff2/DanaFaNum-Regular.woff2);
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Dana Madium';
+    src: local('Dana Madium'), url(../../src/fonts/Dana/woff2/DanaFaNum-Medium.woff2);
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Dana DemiBold';
+    src: local('Dana Bold'), url(../fonts/Dana/woff2/DanaFaNum-DemiBold.woff2);
+    font-display: swap;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  th,
+  td,
+  p {
+    @apply dark:text-white;
+  }
+  input {
+    @apply dark:text-white dark:bg-zinc-500 dark:placeholder:text-white;
+  }
+  .box-Panel {
+    @apply  dark:bg-zinc-700;
+  }
+}
+.swal2-modal {
+  @apply dark:bg-zinc-700 
 }

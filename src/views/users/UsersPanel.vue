@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 class="text-3xl font-extrabold">کاربران</h2>
-    <div class="bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
+    <div class="box-Panel bg-white mt-9 py-4 px-5 mb-4 rounded-xl">
       <TablePanel v-if="users.length" :headers="tableHeaders">
         <template #default>
           <tr v-for="(user, index) in users" :key="index" class="child:px-14 child:text-center">

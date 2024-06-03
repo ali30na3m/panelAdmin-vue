@@ -6,7 +6,7 @@
     ]"
     @click="closeModal"
   >
-    <div class="bg-white p-5 rounded-lg shadow-lg" @click.stop>
+    <div class="box-Panel bg-white p-5 rounded-lg shadow-lg" @click.stop>
       <slot></slot>
       <div class="flex justify-center items-center gap-3">
         <button @click="editModal" class="mt-4 bg-green-500 text-white py-2 px-4 rounded-xl">
