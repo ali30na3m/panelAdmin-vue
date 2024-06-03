@@ -42,7 +42,7 @@
             <td>{{ product.count }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
               <button @click="detailHandler(product)">جزییات</button>
-              <DeleteButton class="mr-3" :deleteID="product.id">حذف</DeleteButton>
+              <DeleteButton class="mr-3" @mutate="mutateDelete" :deleteID="product.id ?? null">حذف</DeleteButton>
               <button @click="editHandler(product)" class="mr-3">ویرایش</button>
             </td>
           </tr>
@@ -59,7 +59,7 @@
     </DetailModal>
 
     <EditModal
-      :url="urlEditModal"
+      url="products"
       :editsValue="editForm"
       :isOpen="isModalEditOpen"
       @mutate="mutateFunc"
@@ -99,17 +99,10 @@ import TablePanel from '@/components/TablePanel.vue'
 import DetailModal from '@/components/Modal/DetailModal.vue'
 import EditModal from '@/components/Modal/EditModal/EditModal.vue'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
-import FetchApis from '@/api/Fetchapi.ts'
-
+import { getApi, postApi } from '@/api'
 import type { ProductInfo } from './type'
-
-import { useRoute } from 'vue-router'
-
 import { onMounted, ref } from 'vue'
-
 import Swal from 'sweetalert2'
-
-const routes = useRoute()
 
 const form = ref<ProductInfo>({
   id: null,
@@ -139,29 +132,23 @@ const isModalDetailOpen = ref<boolean>(false)
 const selectedProduct = ref<ProductInfo | null>(null)
 const isModalEditOpen = ref<boolean>(false)
 
-const urlEditModal = 'http://localhost:8000/api/products/'
+const fetchProducts = async() => {
+  await getApi('products').then(data => products.value = data)
+}
 
-onMounted(async () => {
-  products.value = await FetchApis(routes)
+onMounted(() => {
+    fetchProducts()
 })
 
 const submitProduct = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(form.value)
-    })
-    if (!response.ok) throw new Error('Network response was not ok')
-    const newProduct = await response.json()
-    products.value.push(newProduct)
+    await postApi('products', form.value)
     Swal.fire({
       title: 'عملیات موفق آمیز بود',
       icon: 'success'
-    }).then(async () => {
-      products.value = await FetchApis(routes)
+    }).then(() => {
+      fetchProducts()
+      resetForm()
     })
   } catch (error) {
     console.error('Error submitting product:', error)
@@ -171,7 +158,7 @@ const submitProduct = async () => {
       icon: 'error'
     })
   }
-  resetForm()
+
 }
 
 const detailHandler = (product: ProductInfo) => {
@@ -204,9 +191,13 @@ const mutateFunc = (updatedProduct : ProductInfo) => {
   }
 }
 
+const mutateDelete = () => {
+  return fetchProducts()
+}
+
 const handleEditModalClose = async () => {
   isModalEditOpen.value = false
-  products.value = await FetchApis(routes)
+  await fetchProducts()
 }
 
 const resetForm = () => {

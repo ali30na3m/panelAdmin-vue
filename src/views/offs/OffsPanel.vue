@@ -10,7 +10,7 @@
             <td>{{ off.percent }}</td>
             <td>{{ off.date }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <DeleteButton :deleteID="off.id"> حذف </DeleteButton>
+              <DeleteButton @mutate="mutateDelete" :deleteID="off.id"> حذف </DeleteButton>
               <button
                 v-if="off.isActive === 0"
                 @click="acceptComment(off.id ?? undefined)"
@@ -29,29 +29,30 @@
 </template>
 
 <script lang="ts" setup>
-import FetchApis from '@/api/Fetchapi'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
-
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-
+import { getApi, postApi } from '@/api'
 import type { offInfo } from './type'
 
-import axios from 'axios'
+import { onMounted, ref } from 'vue'
+
 import Swal from 'sweetalert2'
 
 const tableHeaders = ref<string[]>(['محصول', 'ادمین', 'درصد', 'تاریخ'])
 const offs = ref<offInfo[]>([])
 
-const routes = useRoute()
-
-const fetchOffs = async() => {
-  offs.value = await FetchApis(routes)
+const fetchOffs = async () => {
+  await getApi('offs').then((data) => (offs.value = data))
 }
 
-onMounted(fetchOffs)
+onMounted(() => {
+  fetchOffs()
+})
+
+const mutateDelete = () => {
+  return fetchOffs()
+}
 
 const acceptComment = (id: number | undefined) => {
   Swal.fire({
@@ -60,18 +61,15 @@ const acceptComment = (id: number | undefined) => {
     showCancelButton: true,
     confirmButtonText: 'بله',
     cancelButtonText: 'خیر'
-  }).then(async(resault) => {
+  }).then(async (resault) => {
     if (resault.isConfirmed) {
       try {
-        await axios
-          .put(`http://localhost:8000/api/offs/active-off/${id}/1`)
-          .then(() => {
-            Swal.fire({
-              title: 'سفارش تایید شد',
-              icon: 'success',
-              confirmButtonText: 'تایید'
-            }).then(() => fetchOffs())
-          })
+        await postApi(`offs/active-off/${id}/1`)
+        Swal.fire({
+          title: 'سفارش تایید شد',
+          icon: 'success',
+          confirmButtonText: 'تایید'
+        }).then(() => fetchOffs())
       } catch (error) {
         console.log('Error accepting comment:', error)
         Swal.fire({
@@ -91,19 +89,15 @@ const rejectComment = (id: number | undefined) => {
     showCancelButton: true,
     confirmButtonText: 'بله',
     cancelButtonText: 'خیر'
-  }).then(async(resault) => {
+  }).then(async (resault) => {
     if (resault.isConfirmed) {
       try {
-        await axios
-          .put(`http://localhost:8000/api/offs/active-off/${id}/0`)
-          .then(() => {
-            Swal.fire({
-              title: 'سفارش رد شد',
-              icon: 'success',
-              confirmButtonText: 'تایید'
-            }).then(() => fetchOffs())
-          })
-          
+        await postApi(`offs/active-off/${id}/0`)
+        Swal.fire({
+          title: 'سفارش رد شد',
+          icon: 'success',
+          confirmButtonText: 'تایید'
+        }).then(() => fetchOffs())
       } catch (error) {
         console.log('Error accepting comment:', error)
         Swal.fire({
@@ -117,5 +111,5 @@ const rejectComment = (id: number | undefined) => {
 }
 </script>
 
-<style>
+<style scoped>
 </style>

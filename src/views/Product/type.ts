@@ -1,5 +1,5 @@
 export interface ProductInfo {
-    id: number | null
+    id?: number | null
     title: string
     price: number | null
     count: number | null

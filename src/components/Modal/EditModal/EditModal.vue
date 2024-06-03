@@ -21,64 +21,58 @@
 </template>
 
 <script lang="ts" setup>
-import Swal from 'sweetalert2'
-import { defineProps, defineEmits, onMounted, onUnmounted } from 'vue'
+import { putApi } from '@/api';
+import Swal from 'sweetalert2';
+import { defineProps, defineEmits, onMounted, onUnmounted } from 'vue';
 
 import type { EditModalProps } from './Type';
 
-const props = defineProps<EditModalProps>()
-const emit = defineEmits(['close', 'mutate'])
+const props = defineProps<EditModalProps>();
+const emit = defineEmits(['close', 'mutate']);
 
 const editModal = async () => {
   try {
     if (!props.editsValue.id) {
-      throw new Error('Invalid data')
+      throw new Error('Invalid data');
     }
-    const response = await fetch(`${props.url}${props.editsValue.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(props.editsValue)
-    })
-    if (!response.ok) throw new Error('Network response was not ok')
+    await putApi(`${props.url}/${props.editsValue.id}`, props.editsValue);
     Swal.fire({
       title: 'عملیات موفق آمیز بود',
       icon: 'success',
       confirmButtonText: 'تایید'
     }).then(() => {
-      emit('close')
-      emit('mutate', props.editsValue)
-    })
+      emit('close');
+      emit('mutate', props.editsValue);
+    });
   } catch (error) {
-    console.error('Error editing product:', error)
+    console.error('Error editing product:', error);
     Swal.fire({
       title: 'خطا',
       text: 'خطا در ویرایش محصول',
       icon: 'error'
-    })
+    });
   }
-}
+};
 
 const closeModal = () => {
-  emit('close')
-}
+  emit('close');
+};
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape') {
-    closeModal()
+    closeModal();
   } else if (e.key === 'Enter') {
-    editModal()
+    editModal();
   }
-}
+};
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
-})
+  window.addEventListener('keydown', handleKeydown);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
-})
+  window.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <style scoped>

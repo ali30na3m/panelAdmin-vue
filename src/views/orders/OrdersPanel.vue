@@ -11,7 +11,7 @@
             <td>{{ order.price }}</td>
             <td>{{ order.off }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <DeleteButton :deleteID="order.id"> حذف </DeleteButton>
+              <DeleteButton @mutate="mutateDelete" :deleteID="order.id"> حذف </DeleteButton>
               <button
                 v-if="order.isActive === 0"
                 @click="acceptComment(order.id ?? undefined)"
@@ -30,29 +30,32 @@
 </template>
 
 <script lang="ts" setup>
-import FetchApis from '@/api/Fetchapi'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import TablePanel from '@/components/TablePanel.vue'
+import { getApi, putApi } from '@/api'
 
-import axios from 'axios'
 import Swal from 'sweetalert2'
 
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 import type { orderInfo } from './type'
 
 const orders = ref<orderInfo[]>([])
 const tableHeaders = ref<string[]>(['نام و نام خانوادگی', 'محصول', 'تاریخ', 'قیمت', 'تخفیف'])
 
-const route = useRoute()
 
 const fetchOrders = async () => {
-  orders.value = await FetchApis(route)
+  await getApi('orders').then(data => orders.value = data)
 }
 
-onMounted(fetchOrders)
+onMounted(() => {
+  fetchOrders()
+})
+
+const mutateDelete = () => {
+  return fetchOrders()
+}
 
 const acceptComment = async (id: number | undefined) => {
   Swal.fire({
@@ -64,7 +67,7 @@ const acceptComment = async (id: number | undefined) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await axios.put(`http://localhost:8000/api/orders/active-order/${id}/1`)
+        await putApi(`orders/active-order/${id}/1`)
         Swal.fire({
           title: 'سفارش تایید شد',
           icon: 'success',
@@ -93,7 +96,7 @@ const rejectComment = async (id: number | undefined) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await axios.put(`http://localhost:8000/api/orders/active-order/${id}/0`)
+        await putApi(`orders/active-order/${id}/0`)
         Swal.fire({
           title: 'سفارش رد شد',
           icon: 'success',
@@ -113,5 +116,5 @@ const rejectComment = async (id: number | undefined) => {
 }
 </script>
 
-<style>
+<style scoped>
 </style>

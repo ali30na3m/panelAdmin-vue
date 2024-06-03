@@ -59,27 +59,32 @@ export const postApi = async <T = any>(
   }
 
   try {
-    const response = await apiAgent.post<T>(path, { data, params, config })
+    const response = await apiAgent.post<T>(path, data, { params, ...config })
     return onSuccess(response)
   } catch (error) {
     return onError(error)
   }
 }
 
-export const putApi = async<T=any>(path:string,data?:any, params?:any , config?:AxiosRequestConfig<any>)=> {
-    const onSuccess = (response : AxiosResponse<T>) => {
-        return  response.data
-    } 
+export const putApi = async<T = any>(
+  path: string,
+  data?: any,
+  params?: any,
+  config?: AxiosRequestConfig<any>
+) => {
+  const onSuccess = (response: AxiosResponse<T>) => {
+    return response.data
+  }
 
-    const onError = (error : any ) => {
-        console.error('Put Request Failed:', error)
-        return Promise.reject(error.response || error.message)
-    }
+  const onError = (error: any) => {
+    console.error('Put Request Failed:', error)
+    return Promise.reject(error.response || error.message)
+  }
 
-    try {
-        const response = await apiAgent.put<T>(path,{data,params,config})
-        return onSuccess(response)
-    }catch(error) {
-        return onError(error)
-    }
+  try {
+    const response = await apiAgent.put<T>(path, data, { params, ...config })
+    return onSuccess(response)
+  } catch (error) {
+    return onError(error)
+  }
 }

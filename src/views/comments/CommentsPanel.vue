@@ -92,7 +92,7 @@ const fetchComment = async() => {
   await getApi('comments').then(data => comments.value = data)
 }
 
-onMounted(async() => {
+onMounted(() => {
   fetchComment()
 })
 
@@ -165,5 +165,5 @@ const rejectComment = async (id: number | null) => {
 }
 </script>
 
-<style>
+<style scoped> 
 </style>

@@ -10,7 +10,7 @@
             <td>{{ user.phone }}</td>
             <td>{{ user.email }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <DeleteButton :deleteID="user.id"> حذف </DeleteButton>
+              <DeleteButton @mutate="mutateDelete" :deleteID="user.id"> حذف </DeleteButton>
               <button @click="detailHandler(user)" class="mr-3">جزییات</button>
               <button @click="editHandler(user)" class="mr-3">ویرایش</button>
             </td>
@@ -60,11 +60,10 @@ import DetailModal from '@/components/Modal/DetailModal.vue'
 import TablePanel from '@/components/TablePanel.vue'
 import EditModal from '@/components/Modal/EditModal/EditModal.vue'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
-import FetchApis from '@/api/Fetchapi'
+import { getApi } from '@/api'
 import type { userInfo } from './type'
 
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 const isModalDetailOpen = ref<boolean>(false)
 const isModalEditOpen = ref<boolean>(false)
@@ -86,11 +85,17 @@ const editForm = ref<userInfo>({
 })
 const urlEditModal = 'http://localhost:8000/api/users/'
 
-const route = useRoute()
+const fetchUser = async () => {
+  await getApi('users').then((data) => users.value = data)
+}
 
-onMounted(async () => {
-  users.value = await FetchApis(route)
+onMounted(() => {
+  fetchUser()
 })
+
+const mutateDelete = () => {
+  return fetchUser()
+}
 
 const detailHandler = (user: userInfo) => {
   isModalDetailOpen.value = true
@@ -125,6 +130,6 @@ const mutateFunc = (updatedUser: userInfo) => {
 
 const handleEditModalClose = () => {
   isModalEditOpen.value = false
-  FetchApis(route)
+  fetchUser()
 }
 </script>
