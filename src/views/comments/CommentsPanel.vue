@@ -22,7 +22,7 @@
             <td>{{ comment.date }}</td>
             <td>{{ comment.hour }}</td>
             <td class="text-white child:py-2 child:px-3 child:bg-pinkSecondary child:rounded-lg">
-              <DeleteButton :deleteID="comment.id">حذف</DeleteButton>
+              <DeleteButton @mutate="mutateDelete" :deleteID="comment.id">حذف</DeleteButton>
               <button @click="editComment(comment)" class="mr-2">ویرایش</button>
               <button @click="acceptComment(comment.id)" v-if="comment.isAccept === 0" class="mr-2">
                 تایید
@@ -41,7 +41,7 @@
         :url="urlEditModal"
         :editsValue="editCommentData"
         :isOpen="isEditModal"
-        @mutate="mutateFunc"
+        @mutate="mutateEdit"
         @close="handleEditModalClose"
       >
         <template #default>
@@ -58,16 +58,14 @@
 </template>
 
 <script lang="ts" setup>
-import FetchApis from '@/api/Fetchapi'
-
 import TablePanel from '@/components/TablePanel.vue'
 import DetailModal from '@/components/Modal/DetailModal.vue'
 import EditModal from '@/components/Modal/EditModal/EditModal.vue'
 import NothingDiv from '@/components/NothingDiv.vue'
 import DeleteButton from '@/components/Buttons/DeleteButton.vue'
+import { getApi, postApi } from '@/api'
 
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 import type { CommentInfo } from './type' 
 
@@ -90,10 +88,12 @@ const editCommentData = ref<CommentInfo>({
   isAccept: null
 })
 
-const route = useRoute()
+const fetchComment = async() => {
+  await getApi('comments').then(data => comments.value = data)
+}
 
-onMounted(async () => {
-  comments.value = await FetchApis(route)
+onMounted(async() => {
+  fetchComment()
 })
 
 const showComment = (comment: string) => {
@@ -108,9 +108,10 @@ const editComment = (comment: CommentInfo) => {
 
 const handleEditModalClose = async () => {
   isEditModal.value = false
-  await FetchApis(route)
+  await fetchComment()
 }
-const mutateFunc = (updatedComment: CommentInfo) => {
+
+const mutateEdit = (updatedComment: CommentInfo) => {
   const index = comments.value.findIndex((comment) => comment.id === updatedComment.id)
   if (index !== -1) {
     comments.value[index] = { ...updatedComment }
@@ -119,23 +120,20 @@ const mutateFunc = (updatedComment: CommentInfo) => {
   }
 }
 
+const mutateDelete = () => {
+  return fetchComment()
+}
+
 const acceptComment = async (id: number | null) => {
   if (id === null) return
 
   try {
-    const response = await fetch(`http://localhost:8000/api/comments/accept/${id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    if (!response.ok) throw new Error('Network response was not ok')
-    await FetchApis(route)
+    await postApi(`comments/accept/${id}`)
     Swal.fire({
       title: 'کامنت تایید شد',
       icon: 'success',
       confirmButtonText: 'تایید'
-    })
+    }).then(() => fetchComment())
   } catch (error) {
     console.error('Error accepting comment:', error)
     Swal.fire({
@@ -150,19 +148,12 @@ const rejectComment = async (id: number | null) => {
   if (id === null) return
 
   try {
-    const response = await fetch(`http://localhost:8000/api/comments/reject/${id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    if (!response.ok) throw new Error('Network response was not ok')
-    await FetchApis(route)
+    await postApi(`comments/reject/${id}`)
     Swal.fire({
       title: 'کامنت رد شد',
       icon: 'success',
       confirmButtonText: 'تایید'
-    })
+    }).then(() => fetchComment())
   } catch (error) {
     console.error('Error rejecting comment:', error)
     Swal.fire({

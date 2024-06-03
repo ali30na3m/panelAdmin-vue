@@ -10,6 +10,7 @@
         class="flex items-center gap-2 p-2 px-1 rounded-lg hover:bg-purpleSecondary"
         active-class="active-link"
       >
+        <FontAwesomeIcon :icon="router.icon" />
         {{ router.name }}
       </router-link>
     </div>
@@ -17,13 +18,13 @@
 </template>
 
 <script lang="ts" setup>
-import { routes } from '@/router/index';
-import { computed } from 'vue';
+import { routes } from '@/router/index'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { computed } from 'vue'
 
 const filteredRoutes = computed(() => {
-  return routes.filter(route => route.meta.isSideBar);
-});
-
+  return routes.filter((route) => route.meta.isSideBar)
+})
 </script>
 
 <style scoped>

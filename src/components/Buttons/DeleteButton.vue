@@ -5,13 +5,14 @@
 </template>
 
 <script lang="ts" setup>
-import axios from 'axios'
+import { deleteApi } from '@/api';
 import Swal from 'sweetalert2'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const params = route.fullPath
 const props = defineProps<{ deleteID: number | null }>()
+const emit = defineEmits(['mutate'])
 
 const removeComment = async (id: number | null) => {
   if (id === null) return
@@ -24,12 +25,12 @@ const removeComment = async (id: number | null) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        axios.delete(`http://localhost:8000/api${params}/${id}`)
+        deleteApi(`${params}/${id}`)
         Swal.fire({
           title: 'عملیات موفق آمیز بود',
           icon: 'success',
           confirmButtonText: 'تایید'
-        })
+        }).then(() => emit('mutate'))
       } catch (error) {
         console.error('Error deleting comment:', error)
         Swal.fire({
@@ -41,6 +42,8 @@ const removeComment = async (id: number | null) => {
     }
   })
 }
+
+
 </script>
 
 <style>
